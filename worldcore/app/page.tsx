@@ -77,7 +77,7 @@ export default function Page() {
   return (
     <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
       <ReactorProvider
-        modelName="hy-world"
+        modelName="worldcore"
         jwtToken={jwtToken}
         local={isLocalMode}
         autoConnect={false}

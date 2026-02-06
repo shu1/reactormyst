@@ -98,7 +98,7 @@ This demo uses:
 
 ## Model Commands
 
-The WorldCore model (`hy-world`) exposes the following commands:
+The WorldCore model (`worldcore`) exposes the following commands:
 
 - `set_keyboard_action` - Set WASD movement (w/s/a/d/still)
 - `set_camera_action` - Set camera rotation (left/right/up/down/still)
