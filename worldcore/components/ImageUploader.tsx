@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useReactor } from "@reactor-team/js-sdk";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -80,6 +80,17 @@ export function ImageUploader({ className = "" }: ImageUploaderProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSent, setIsSent] = useState(false);
+
+  // Reset all state when disconnected so UI is clean on reconnect
+  useEffect(() => {
+    if (status !== "ready") {
+      setUploadedImage(null);
+      setSelectedExampleId(null);
+      setIsLoading(false);
+      setError(null);
+      setIsSent(false);
+    }
+  }, [status]);
 
   // Resize then store
   const storeResized = useCallback(async (dataUrl: string) => {
