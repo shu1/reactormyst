@@ -32,7 +32,6 @@ cp .env.example .env.local
 Edit `.env.local` and add:
 
 - `NEXT_PUBLIC_REACTOR_API_KEY` - Your Reactor API key
-- `OPENAI_API_KEY` - Your OpenAI API key (required for voice input feature)
 
 ### 3. Run the Development Server
 

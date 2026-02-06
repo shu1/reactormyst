@@ -34,9 +34,6 @@ Copy `.env.example` to `.env.local` and fill in your keys:
 cp .env.example .env.local
 ```
 
-Required for prompt enhancement:
-- `OPENAI_API_KEY` - Your OpenAI API key
-
 ### Development
 
 ```bash
@@ -98,7 +95,6 @@ This demo uses:
 - **@reactor-team/js-sdk** - Reactor SDK for WebRTC streaming
 - **@reactor-team/ui** - Reactor design system
 - **Tailwind CSS 4** - Styling
-- **OpenAI GPT-4o-mini** - Prompt enhancement
 
 ## Model Commands
 
