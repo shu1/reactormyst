@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "WorldCore - Real-time Interactive World Model",
+  title: "ReactorMyst - Supercell AI Hackathon",
   description: "A real-time interactive world model demo with keyboard and camera controls",
 };
 

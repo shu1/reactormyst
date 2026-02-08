@@ -9,6 +9,79 @@ import { ImageUploader } from "@/components/ImageUploader";
 import { Button } from "@/components/ui/button";
 import { useReactor } from "@reactor-team/js-sdk";
 import { Maximize2, Minimize2 } from "lucide-react";
+import { resizeImage } from "@/lib/image-utils";
+import { NavigationLayer } from "@/components/NavigationLayer";
+
+// Start button component - uploads img/00.png as starting image
+function StartButton({ onStart }: { onStart: () => void }) {
+  const { sendCommand, status } = useReactor((state) => ({
+    sendCommand: state.sendCommand,
+    status: state.status,
+  }));
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleStart = async () => {
+    if (status !== "ready") return;
+
+    try {
+      setIsLoading(true);
+      console.log("Fetching img/00.png...");
+
+      // Fetch the default image
+      // Note: using absolute path from public root
+      const response = await fetch("/img/00.png");
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+
+      // Convert to base64
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const base64String = reader.result as string;
+          // Resize/normalize using shared utility
+          const resized = await resizeImage(base64String);
+          const base64Data = resized.split(",")[1];
+
+          await sendCommand("set_starting_image", {
+            image_base64: base64Data,
+          });
+          onStart();
+          console.log("Start: default image set successfully");
+        } catch (err) {
+          console.error("Failed to process start image:", err);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      reader.onerror = () => {
+        console.error("Failed to read start image blob");
+        setIsLoading(false);
+      };
+      reader.readAsDataURL(blob);
+
+    } catch (error) {
+      console.error("Failed to start:", error);
+      setIsLoading(false);
+    }
+  };
+
+  if (status !== "ready") return null;
+
+  return (
+    <Button
+      size="xs"
+      variant="default" // Green/primary distinct from destructive Reset
+      onClick={handleStart}
+      disabled={isLoading}
+      className="backdrop-blur-sm bg-green-600/90 hover:bg-green-600 border-green-500/50"
+    >
+      {isLoading ? "Loading..." : "Start"}
+    </Button>
+  );
+}
 
 // Reset button component (needs to be inside ReactorProvider)
 function ResetButton() {
@@ -45,6 +118,7 @@ export default function Page() {
   const [jwtToken, setJwtToken] = useState<string | undefined>(undefined);
   const [isLocalMode, setIsLocalMode] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [currentImageId, setCurrentImageId] = useState<string | null>(null);
 
   // Ensure dark mode is applied to html element
   useEffect(() => {
@@ -104,16 +178,23 @@ export default function Page() {
                 <ReactorView className="w-full h-full object-contain" />
               </div>
 
-              {/* Overlay controls - float on top */}
-              <OverlayControls className="absolute inset-0" />
+              {/* Navigation Layer - intercepts clicks */}
+              <NavigationLayer
+                currentImageId={currentImageId}
+                onNavigate={setCurrentImageId}
+              />
 
-              {/* Top-left: Reset button */}
-              <div className="absolute top-3 left-3 pointer-events-auto">
+              {/* Overlay controls - float on top */}
+              <OverlayControls className="absolute inset-0 pointer-events-none" />
+
+              {/* Top-left: Reset & Start buttons */}
+              <div className="absolute top-3 left-3 pointer-events-auto flex gap-2 z-20">
+                <StartButton onStart={() => setCurrentImageId("00")} />
                 <ResetButton />
               </div>
 
               {/* Top-right: Fullscreen toggle */}
-              <div className="absolute top-3 right-3 pointer-events-auto">
+              <div className="absolute top-3 right-3 pointer-events-auto z-20">
                 <Button
                   size="xs"
                   variant="secondary"
@@ -127,15 +208,6 @@ export default function Page() {
                   )}
                 </Button>
               </div>
-            </div>
-
-            {/* Controls panel - stays at bottom */}
-            <div className={`shrink-0 ${
-              isFullscreen 
-                ? "p-3 flex gap-3 bg-card border-t border-border" 
-                : "p-3 flex gap-3 bg-card rounded-lg border border-border"
-            }`}>
-              <ImageUploader className="border-0 p-0 bg-transparent" />
             </div>
           </div>
         </main>

@@ -12,9 +12,9 @@ export function HeaderControls({ className }: HeaderControlsProps) {
     <header className={cn("flex items-center justify-between px-4 py-2 border-b border-border bg-card", className)}>
       {/* Left: Title */}
       <div className="flex items-center gap-3">
-        <h1 className="text-lg font-semibold text-foreground">WorldCore</h1>
+        <h1 className="text-lg font-semibold text-foreground">ReactorMyst</h1>
         <span className="text-xs text-muted-foreground px-2 py-0.5 bg-muted rounded hidden sm:inline-block">
-          Interactive World Model
+          Supercell AI Hackathon
         </span>
       </div>
 
